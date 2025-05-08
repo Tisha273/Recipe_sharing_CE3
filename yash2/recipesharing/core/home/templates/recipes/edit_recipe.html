@@ -1,0 +1,198 @@
+
+{% extends 'Base/base.html' %}
+
+{% block title %}Edit Recipe - {{ recipe.name }}{% endblock %}
+
+{% block content %}
+<section class="edit-recipe-section">
+    <div class="container">
+        <div class="page-header">
+            <h1>Edit Recipe</h1>
+            <p>Update your recipe details</p>
+        </div>
+        
+        <div class="edit-recipe-container">
+            <form method="POST" enctype="multipart/form-data" class="form recipe-form">
+                {% csrf_token %}
+                <div class="form-grid">
+                    <div class="form-main">
+                        <div class="form-group">
+                            <label>Recipe Name</label>
+                            <input type="text" name="name" value="{{ recipe.name }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea name="description" rows="4" required>{{ recipe.description }}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select name="category" required>
+                                {% for category in categories %}
+                                <option value="{{ category.0 }}" {% if recipe.category == category.0 %}selected{% endif %}>
+                                    {{ category.1 }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-section">
+                            <div class="section-header">
+                                <h3>Recipe Steps</h3>
+                                <button type="button" class="btn btn-sm btn-outline" id="addStepBtn">
+                                    <i class="fas fa-plus"></i> Add Step
+                                </button>
+                            </div>
+                            <div id="stepsContainer" class="steps-list">
+                                {% for step in recipe.steps.all %}
+                                <div class="step-item">
+                                    <div class="step-number">{{ step.step_number }}</div>
+                                    <div class="step-content">
+                                        <input type="text" name="steps[]" value="{{ step.description }}" required>
+                                        <button type="button" class="btn-remove" onclick="removeStep(this)">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <div class="section-header">
+                                <h3>Ingredients</h3>
+                                <button type="button" class="btn btn-sm btn-outline" id="addIngredientBtn">
+                                    <i class="fas fa-plus"></i> Add Ingredient
+                                </button>
+                            </div>
+                            <div id="ingredientsContainer" class="ingredients-list">
+                                {% for ingredient in recipe.ingredients.all %}
+                                <div class="ingredient-item">
+                                    <div class="ingredient-content">
+                                        <input type="text" name="ingredients[]" value="{{ ingredient.name }}" placeholder="Ingredient" required>
+                                        <input type="text" name="quantities[]" value="{{ ingredient.quantity }}" placeholder="Quantity" required>
+                                        <button type="button" class="btn-remove" onclick="removeIngredient(this)">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-sidebar">
+                        <div class="image-preview-container">
+                            <h3>Recipe Image</h3>
+                            <div class="current-image">
+                                <img src="{{ recipe.image.url }}" alt="{{ recipe.name }}">
+                            </div>
+                            <div class="file-upload">
+                                <input type="file" name="image" id="recipe-image">
+                                <label for="recipe-image" class="file-label">
+                                    <i class="fas fa-camera"></i>
+                                    <span>Change Image</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="recipe-meta-info">
+                            <div class="meta-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <div class="meta-content">
+                                    <span class="meta-label">Created</span>
+                                    <span class="meta-value">{{ recipe.created_at|date:"F j, Y" }}</span>
+                                </div>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-eye"></i>
+                                <div class="meta-content">
+                                    <span class="meta-label">Views</span>
+                                    <span class="meta-value">124</span>
+                                </div>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-heart"></i>
+                                <div class="meta-content">
+                                    <span class="meta-label">Favorites</span>
+                                    <span class="meta-value">18</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Update Recipe</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+{% block extra_js %}
+<script>
+    const fileInput = document.getElementById('recipe-image');
+    const currentImage = document.querySelector('.current-image img');
+    
+    fileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentImage.src = e.target.result;
+            }
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+
+    const addStepBtn = document.getElementById('addStepBtn');
+    const stepsContainer = document.getElementById('stepsContainer');
+    
+    addStepBtn.addEventListener('click', function() {
+        const stepCount = stepsContainer.querySelectorAll('.step-item').length + 1;
+        const stepHtml = `
+            <div class="step-item">
+                <div class="step-number">${stepCount}</div>
+                <div class="step-content">
+                    <input type="text" name="steps[]" placeholder="Describe this step" required>
+                    <button type="button" class="btn-remove" onclick="removeStep(this)">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        stepsContainer.insertAdjacentHTML('beforeend', stepHtml);
+    });
+    
+    function removeStep(button) {
+        button.closest('.step-item').remove();
+        const steps = stepsContainer.querySelectorAll('.step-item');
+        steps.forEach((step, index) => {
+            step.querySelector('.step-number').textContent = index + 1;
+        });
+    }
+    
+    const addIngredientBtn = document.getElementById('addIngredientBtn');
+    const ingredientsContainer = document.getElementById('ingredientsContainer');
+    
+    addIngredientBtn.addEventListener('click', function() {
+        const ingredientHtml = `
+            <div class="ingredient-item">
+                <div class="ingredient-content">
+                    <input type="text" name="ingredients[]" placeholder="Ingredient" required>
+                    <input type="text" name="quantities[]" placeholder="Quantity" required>
+                    <button type="button" class="btn-remove" onclick="removeIngredient(this)">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        ingredientsContainer.insertAdjacentHTML('beforeend', ingredientHtml);
+    });
+    
+    function removeIngredient(button) {
+        button.closest('.ingredient-item').remove();
+    }
+</script>
+{% endblock %}
+{% endblock %}

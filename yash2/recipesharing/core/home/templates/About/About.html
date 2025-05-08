@@ -1,0 +1,157 @@
+{% extends 'Base/base.html' %}
+{% load static %}
+
+{% block title %}About Us - Recipe Share{% endblock %}
+
+{% block content %}
+<section class="about-hero">
+    <div class="container">
+        <div class="about-hero-content">
+            <h1>Our Story</h1>
+            <div class="section-line"></div>
+            <p class="lead">Bringing food lovers together to share their culinary passion</p>
+        </div>
+    </div>
+</section>
+
+<section class="about-mission">
+    <div class="container">
+        <div class="mission-grid">
+            <div class="mission-content">
+                <h2>Our Mission</h2>
+                <div class="section-line"></div>
+                <p>Recipe Share was founded with a simple yet powerful mission: to create a vibrant community where food enthusiasts can connect, share, and discover amazing recipes from around the world. We believe that cooking is not just about feeding ourselves—it's about creativity, tradition, and bringing people together.</p>
+                <div class="mission-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">10K+</span>
+                        <span class="stat-label">Active Users</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">5K+</span>
+                        <span class="stat-label">Recipes Shared</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">50+</span>
+                        <span class="stat-label">Countries</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mission-image">
+                <img src="{% static 'images/blog12.jpg' %}"alt="Our Mission">
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="about-values">
+    <div class="container">
+        <h2 class="text-center">Our Values</h2>
+        <div class="section-line"></div>
+        <div class="values-grid">
+            <div class="value-card">
+                <div class="value-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h3>Passion for Food</h3>
+                <p>We're passionate about bringing the joy of cooking to everyone, from beginners to expert chefs.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Community First</h3>
+                <p>Our community is at the heart of everything we do, fostering connections through shared culinary experiences.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <h3>Innovation</h3>
+                <p>We continuously strive to improve and innovate, making recipe sharing easier and more enjoyable.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <h3>Diversity</h3>
+                <p>We celebrate the rich diversity of cuisines and cooking traditions from around the world.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="about-team">
+    <div class="container">
+        <h2 class="text-center">Meet Our Team</h2>
+        <div class="section-line"></div>
+        <div class="team-grid">
+            <div class="team-card">
+                <div class="team-image">
+                    <img src="https://placehold.co/300x300" alt="Team Member">
+                </div>
+                <h3>Sonal Goyal</h3>
+                <p class="team-role">Leader</p>
+                <p class="team-bio">Passionate about bringing people together through food.</p>
+                <div class="team-social">
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+            <div class="team-card">
+                <div class="team-image">
+                    <img src="https://placehold.co/300x300" alt="Team Member">
+                </div>
+                <h3>Tisha Sharma</h3>
+                <p class="team-role">Co-Leader</p>
+                <p class="team-bio">Dedicated to building and nurturing our foodie community.</p>
+                <div class="team-social">
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+            <div class="team-card">
+                <div class="team-image">
+                    <img src="https://placehold.co/300x300" alt="Team Member">
+                </div>
+                <h3>Mehnoor Kaur</h3>
+                <p class="team-role">Co-Leader</p>
+                <p class="team-bio">Dedicated to building and nurturing our foodie community.</p>
+                <div class="team-social">
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+
+            <div class="team-card">
+                <div class="team-image">
+                    <img src="https://placehold.co/300x300" alt="Team Member">
+                </div>
+                <h3>Swati Rana</h3>
+                <p class="team-role">Co-Leader</p>
+                <p class="team-bio">Dedicated to building and nurturing our foodie community.</p>
+                <div class="team-social">
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</section>
+
+<section class="about-join">
+    <div class="container">
+        <div class="join-content">
+            <h2>Join Our Community</h2>
+            <p>Be part of our growing community of food lovers and share your culinary creations with the world.</p>
+            {% if not user.is_authenticated %}
+                <div class="join-buttons">
+                    <a href="{% url 'register' %}" class="btn btn-primary">Sign Up Now</a>
+                    <a href="{% url 'login' %}" class="btn btn-outline">Login</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

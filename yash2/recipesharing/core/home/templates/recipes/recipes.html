@@ -1,0 +1,112 @@
+{% extends 'Base/base.html' %}
+
+  {% block title %}All Recipes{% endblock %}
+
+  {% block content %}
+  <section class="recipes-section">
+      <div class="container">
+          <div class="page-header">
+              <h1>Explore Recipes</h1>
+              <p>Discover delicious recipes from our community</p>
+          </div>
+          
+          <div class="filter-bar">
+              <form method="GET" class="filter-form">
+                  <div class="search-box">
+                      <i class="fas fa-search"></i>
+                      <input type="text" name="search" placeholder="Search recipes..." value="{{ request.GET.search }}">
+                  </div>
+                  <div class="filter-select">
+                      <select name="category">
+                          <option value="">All Categories</option>
+                          {% for category in categories %}
+                          <option value="{{ category.0 }}" {% if selected_category == category.0 %}selected{% endif %}>
+                              {{ category.1 }}
+                          </option>
+                          {% endfor %}
+                      </select>
+                  </div>
+                  <button type="submit" class="btn btn-filter">Filter</button>
+              </form>
+          </div>
+          
+          <div class="category-pills">
+              <a href="{% url 'recipes' %}" class="category-pill {% if not selected_category %}active{% endif %}">All</a>
+              {% for category in categories %}
+              <a href="{% url 'recipes' %}?category={{ category.0 }}" class="category-pill {% if selected_category == category.0 %}active{% endif %}">
+                  {{ category.1 }}
+              </a>
+              {% endfor %}
+          </div>
+          
+          <div class="recipes-grid">
+              {% for recipe in recipes %}
+              <div class="recipe-card">
+                  <div class="recipe-image">
+                      {% if recipe.image %}
+                      <img src="/media/{{ recipe.image }}" alt="{{ recipe.name }}">
+                      {% else %}
+                      <img src="/media/placeholder.jpg" alt="{{ recipe.name }}">
+                      {% endif %}
+                      <div class="recipe-overlay">
+                          <a href="{% url 'view_recipe' recipe.id %}" class="btn-view">View Recipe</a>
+                      </div>
+                      <span class="recipe-category">{{ recipe.category|title }}</span>
+                  </div>
+                  <div class="recipe-content">
+                      <h3 class="recipe-title">{{ recipe.name }}</h3>
+                      <p class="recipe-description">{{ recipe.description|truncatewords:15 }}</p>
+                      <div class="recipe-meta">
+                          <div class="recipe-author">
+                              <i class="fas fa-user"></i>
+                              <span>{{ recipe.user_username|default:"Unknown" }}</span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              {% empty %}
+              <div class="empty-state">
+                  <div class="empty-icon">
+                      <i class="fas fa-search"></i>
+                  </div>
+                  <h3>No recipes found</h3>
+                  <p>We couldn't find any recipes matching your search criteria.</p>
+                  <a href="{% url 'recipes' %}" class="btn btn-primary">Clear Filters</a>
+              </div>
+              {% endfor %}
+          </div>
+          
+          {% if recipes.has_other_pages %}
+          <div class="pagination">
+              {% if recipes.has_previous %}
+              <a href="?page={{ recipes.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" class="pagination-arrow">
+                  <i class="fas fa-chevron-left"></i>
+              </a>
+              {% else %}
+              <span class="pagination-arrow disabled">
+                  <i class="fas fa-chevron-left"></i>
+              </span>
+              {% endif %}
+              
+              {% for num in recipes.paginator.page_range %}
+                  {% if recipes.number == num %}
+                  <span class="pagination-number active">{{ num }}</span>
+                  {% else %}
+                  <a href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" class="pagination-number">{{ num }}</a>
+                  {% endif %}
+              {% endfor %}
+              
+              {% if recipes.has_next %}
+              <a href="?page={{ recipes.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" class="pagination-arrow">
+                  <i class="fas fa-chevron-right"></i>
+              </a>
+              {% else %}
+              <span class="pagination-arrow disabled">
+                  <i class="fas fa-chevron-right"></i>
+              </span>
+              {% endif %}
+          </div>
+          {% endif %}
+      </div>
+  </section>
+  {% endblock %}

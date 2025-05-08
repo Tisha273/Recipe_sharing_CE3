@@ -1,0 +1,287 @@
+
+{% extends 'Base/base.html' %}
+{% load static %}
+
+{% block title %}Welcome to Recipe Share{% endblock %}
+
+{% block content %}
+
+
+<section class="hero">
+    <div class="hero-overlay"></div>
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">Share Your Culinary Magic</h1>
+                <p class="hero-subtitle">Discover, create, and share amazing recipes with food lovers around the world.</p>
+                {% if not user.is_authenticated %}
+                    <div class="hero-buttons">
+                        <a href="{% url 'register' %}" class="btn btn-primary">Join Now</a>
+                        <a href="{% url 'login' %}" class="btn btn-outline">Login</a>
+                    </div>
+                {% else %}
+                    <div class="hero-buttons">
+                        <a href="{% url 'dashboard' %}" class="btn btn-primary">My Dashboard</a>
+                        <a href="{% url 'recipes' %}" class="btn btn-outline">Explore Recipes</a>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="hero-image">
+                <div class="floating-image">
+                    <img src="{% static 'images/blog10.jpg' %}" alt="Cooking">
+                </div>
+                <div class="floating-cards">
+                    <div class="recipe-card mini">
+                        <div class="recipe-image">
+                            <img src="{% static 'images/feature.jpg' %}" alt="Recipe">
+                        </div>
+                        <div class="recipe-info">
+                            <h3>Sallad</h3>
+                            <span class="recipe-tag">Italian</span>
+                        </div>
+                    </div>
+                    <div class="recipe-card mini">
+                        <div class="recipe-image">
+                            <img src="{% static 'images/feature-small-2.png' %}" alt="Recipe">
+                        </div>
+                        <div class="recipe-info">
+                            <h3>Noodles</h3>
+                            <span class="recipe-tag">Dessert</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="featured-recipes">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Latest Recipes</h2>
+            <div class="section-line"></div>
+        </div>
+        <div class="recipes-grid">
+            {% for recipe in recipes %}
+            <div class="recipe-card">
+                <div class="recipe-image">
+                    <img src="{{ recipe.image.url }}" alt="{{ recipe.name }}">
+                    <div class="recipe-overlay">
+                        <a href="{% url 'view_recipe' recipe.id %}" class="btn-view">View Recipe</a>
+                    </div>
+                    <span class="recipe-category">{{ recipe.get_category_display }}</span>
+                </div>
+                <div class="recipe-content">
+                    <h3 class="recipe-title">{{ recipe.name }}</h3>
+                    <p class="recipe-description">{{ recipe.description|truncatewords:15 }}</p>
+                    <div class="recipe-meta">
+                        <div class="recipe-author">
+                            <i class="fas fa-user"></i>
+                            <span>{{ recipe.user.username }}</span>
+                        </div>
+                        <div class="recipe-time">
+                            <i class="fas fa-clock"></i>
+                            <span>30 min</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="view-all">
+            <a href="{% url 'recipes' %}" class="btn btn-primary">View All Recipes</a>
+        </div>
+    </div>
+</section>
+
+<section class="features">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Why Choose Recipe Share?</h2>
+            <div class="section-line"></div>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <h3 class="feature-title">Share Your Recipes</h3>
+                <p class="feature-description">Upload and share your favorite recipes with our community of food enthusiasts.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="feature-title">Discover New Dishes</h3>
+                <p class="feature-description">Explore a wide variety of recipes from different cuisines and skill levels.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="feature-title">Join the Community</h3>
+                <p class="feature-description">Connect with other food lovers and share your culinary experiences.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h3 class="feature-title">Rate & Review</h3>
+                <p class="feature-description">Rate recipes and leave reviews to help others find the best dishes.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="categories">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Browse by Category</h2>
+            <div class="section-line"></div>
+        </div>
+        <div class="categories-grid">
+            <a href="{% url 'recipes' %}?category=breakfast" class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-coffee"></i>
+                </div>
+                <h3 class="category-title">Breakfast</h3>
+                <p class="category-description">Start your day with delicious breakfast recipes</p>
+            </a>
+            <a href="{% url 'recipes' %}?category=lunch" class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-hamburger"></i>
+                </div>
+                <h3 class="category-title">Lunch</h3>
+                <p class="category-description">Quick and easy lunch ideas for busy days</p>
+            </a>
+            <a href="{% url 'recipes' %}?category=dinner" class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-utensil-spoon"></i>
+                </div>
+                <h3 class="category-title">Dinner</h3>
+                <p class="category-description">Impressive dinner recipes for any occasion</p>
+            </a>
+            <a href="{% url 'recipes' %}?category=dessert" class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-cookie-bite"></i>
+                </div>
+                <h3 class="category-title">Desserts</h3>
+                <p class="category-description">Sweet treats to satisfy your cravings</p>
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="testimonials">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">What Our Users Say</h2>
+            <div class="section-line"></div>
+        </div>
+        <div class="testimonials-slider">
+            <div class="testimonial-card">
+                <div class="testimonial-content">
+                    <p>"Recipe Share has transformed how I cook. I've disc
+                        overed so many amazing recipes and improved my cooking skills!"</p>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        <img src="https://placehold.co/100x100" alt="User">
+                    </div>
+                    <div class="author-info">
+                        <h4>Sarah Johnson</h4>
+                        <p>Food Enthusiast</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-content">
+                    <p>"I love how easy it is to share my family recipes and get feedback from other cooking enthusiasts. Great platform!"</p>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        <img src="https://placehold.co/100x100" alt="User">
+                    </div>
+                    <div class="author-info">
+                        <h4>Michael Chen</h4>
+                        <p>Home Chef</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-content">
+                    <p>"The variety of recipes is amazing. I've tried dishes from around the world that I never would have discovered otherwise."</p>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        <img src="https://placehold.co/100x100" alt="User">
+                    </div>
+                    <div class="author-info">
+                        <h4>Emily Rodriguez</h4>
+                        <p>Culinary Student</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="testimonial-dots">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+    </div>
+</section>
+
+<section class="cta">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Ready to Start Sharing Your Recipes?</h2>
+            <p>Join our community today and start sharing your culinary creations with food enthusiasts worldwide.</p>
+            {% if not user.is_authenticated %}
+                <a href="{% url 'register' %}" class="btn btn-light">Get Started</a>
+            {% else %}
+                <a href="{% url 'dashboard' %}" class="btn btn-light">Go to Dashboard</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const dots = document.querySelectorAll('.testimonial-dots .dot');
+    const testimonials = document.querySelectorAll('.testimonial-card');
+    let currentSlide = 0;
+
+    function showSlide(index) {
+        testimonials.forEach(testimonial => {
+            testimonial.style.opacity = '0';
+            testimonial.style.transform = 'translateX(20px)';
+            testimonial.style.display = 'none';
+        });
+        
+        dots.forEach(dot => dot.classList.remove('active'));
+        
+        testimonials[index].style.display = 'block';
+        setTimeout(() => {
+            testimonials[index].style.opacity = '1';
+            testimonials[index].style.transform = 'translateX(0)';
+        }, 50);
+        
+        dots[index].classList.add('active');
+        currentSlide = index;
+    }
+
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            showSlide(index);
+        });
+    });
+
+    setInterval(() => {
+        let nextSlide = (currentSlide + 1) % testimonials.length;
+        showSlide(nextSlide);
+    }, 5000);
+
+    showSlide(0);
+</script>
+{% endblock %}

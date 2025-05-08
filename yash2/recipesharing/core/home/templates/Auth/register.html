@@ -1,0 +1,135 @@
+{% extends 'Base/base.html' %}
+{% load static %}
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="container">
+        <div class="auth-container">
+            <div class="auth-image">
+                <img src="{% static 'images/blog12.jpg' %}" alt="Cooking">
+                <div class="auth-overlay">
+                    <div class="auth-quote">
+                        <i class="fas fa-quote-left"></i>
+                        <p>"People who love to eat are always the best people."</p>
+                        <span>- Julia Child</span>
+                    </div>
+                </div>
+            </div>
+            <div class="auth-form">
+                <div class="auth-header">
+                    <h2>Create Account</h2>
+                    <p>Join our community of food enthusiasts</p>
+                </div>
+                <form method="POST" class="form">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <div class="input-group">
+                            <span class="input-icon"><i class="fas fa-user"></i></span>
+                            <input type="text" id="username" name="username" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <div class="input-group">
+                            <span class="input-icon"><i class="fas fa-envelope"></i></span>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password1">Password</label>
+                        <div class="input-group">
+                            <span class="input-icon"><i class="fas fa-lock"></i></span>
+                            <input type="password" id="password1" name="password1" required>
+                            <span class="password-toggle"><i class="fas fa-eye"></i></span>
+                        </div>
+                        <div class="password-strength">
+                            <div class="strength-meter">
+                                <span class="meter-section"></span>
+                                <span class="meter-section"></span>
+                                <span class="meter-section"></span>
+                                <span class="meter-section"></span>
+                            </div>
+                            <span class="strength-text">Password strength</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password2">Confirm Password</label>
+                        <div class="input-group">
+                            <span class="input-icon"><i class="fas fa-lock"></i></span>
+                            <input type="password" id="password2" name="password2" required>
+                        </div>
+                    </div>
+                    <div class="form-terms">
+                        <input type="checkbox" id="terms" name="terms" required>
+                        <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Register</button>
+                </form>
+                <div class="social-login">
+                    <p>Or register with</p>
+                    <div class="social-buttons">
+                        <button class="social-btn google">
+                            <i class="fab fa-google"></i>
+                            <span>Google</span>
+                        </button>
+                        <button class="social-btn facebook">
+                            <i class="fab fa-facebook-f"></i>
+                            <span>Facebook</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="auth-footer">
+                    <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% block extra_js %}
+<script>
+    const passwordToggle = document.querySelector('.password-toggle');
+    const passwordInput = document.querySelector('#password1');
+    
+    passwordToggle.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        this.querySelector('i').classList.toggle('fa-eye');
+        this.querySelector('i').classList.toggle('fa-eye-slash');
+    });
+
+    const strengthMeter = document.querySelector('.strength-meter');
+    const strengthText = document.querySelector('.strength-text');
+    const meterSections = document.querySelectorAll('.meter-section');
+
+    passwordInput.addEventListener('input', function() {
+    const val = passwordInput.value;
+    let strength = 0;
+
+    if (val.length >= 12) {
+        strength = 3; // Strong
+    } else if (val.length >= 8) {
+        strength = 2; // Good
+    } else if (val.length >= 5) {
+        strength = 1; // Fair
+    } else {
+        strength = 0; // Weak
+    }
+
+    meterSections.forEach((section, index) => {
+        if (index < strength) {
+            section.classList.add('active');
+        } else {
+            section.classList.remove('active');
+        }
+    });
+
+    const strengthLabels = ['Weak', 'Fair', 'Good', 'Strong'];
+    strengthText.textContent = val ? strengthLabels[strength] : '';
+});
+
+</script>
+{% endblock %}
+{% endblock %}
