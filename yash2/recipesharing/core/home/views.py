@@ -1,12 +1,107 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login, logout, authenticate
+import requests
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.contrib import messages
-from django.contrib.auth.models import User
-from django.core.paginator import Paginator
 from .models import Recipe, RecipeStep, Ingredient
 from .forms import RecipeForm, UserRegisterForm
+from django.shortcuts import  get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.models import User
+from django.core.paginator import Paginator
 from django.db.models import Q
+
+
+from rest_framework import viewsets
+from .models import MyModel  # or whatever your actual model is
+from .serializers import MyModelSerializer  # match your serializer name
+
+
+FLASK_API_URL = 'http://127.0.0.1:5000'
+
+def search_flask_api(request):
+    query = request.GET.get('q', '')
+    data = []
+    if query:
+        try:
+            response = requests.get(f'{FLASK_API_URL}/search', params={'q': query})
+            if response.status_code == 200:
+                data = response.json()
+        except Exception as e:
+            print("Search error:", e)
+            data = [{"name": "Error", "description": "Flask API not reachable"}]
+    return render(request, 'search.html', {'data': data, 'query': query})
+
+
+# List all mymodel items
+def mymodel_list(request):
+    try:
+        response = requests.get(f'{FLASK_API_URL}/api/mymodel')
+        data = response.json() if response.status_code == 200 else []
+    except Exception as e:
+        print("List error:", e)
+        data = []
+    return render(request, 'mymodel/list.html', {'items': data})
+
+
+# Create new mymodel item
+def mymodel_create(request):
+    if request.method == 'POST':
+        payload = {
+            'id': int(request.POST.get('id')),
+            'name': request.POST.get('name'),
+            'ingredients': request.POST.get('ingredients')
+        }
+        try:
+            response = requests.post(f'{FLASK_API_URL}/api/mymodel', json=payload)
+            if response.status_code == 201:
+                messages.success(request, "Item created!")
+        except Exception as e:
+            print("Create error:", e)
+            messages.error(request, "Failed to connect to Flask.")
+        return redirect('mymodel_list')
+    return render(request, 'mymodel/create.html')
+
+
+# Edit/update an item
+def mymodel_update(request, id):
+    if request.method == 'POST':
+        payload = {
+            'name': request.POST.get('name'),
+            'ingredients': request.POST.get('ingredients')
+        }
+        try:
+            response = requests.put(f'{FLASK_API_URL}/api/mymodel/{id}', json=payload)
+            if response.status_code == 200:
+                messages.success(request, "Item updated!")
+        except Exception as e:
+            print("Update error:", e)
+            messages.error(request, "Failed to update item.")
+        return redirect('mymodel_list')
+    else:
+        try:
+            response = requests.get(f'{FLASK_API_URL}/api/mymodel/{id}')
+            item = response.json() if response.status_code == 200 else {}
+        except Exception as e:
+            print("Fetch error:", e)
+            item = {}
+        return render(request, 'mymodel/edit.html', {'item': item})
+
+
+# Delete an item
+def mymodel_delete(request, id):
+    try:
+        response = requests.delete(f'{FLASK_API_URL}/api/mymodel/{id}')
+        if response.status_code == 200:
+            messages.success(request, "Item deleted.")
+    except Exception as e:
+        print("Delete error:", e)
+        messages.error(request, "Failed to delete item.")
+    return redirect('mymodel_list')
+
+
+
+
 
 def home(request):
     latest_recipes = Recipe.objects.all().order_by('-created_at')[:6]
@@ -26,6 +121,8 @@ def register(request):
         form = UserRegisterForm()
     return render(request, 'Auth/register.html', {'form': form})
 
+
+
 def login_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -43,11 +140,18 @@ def login_view(request):
             messages.error(request, 'User does not exist.')
     return render(request, 'Auth/login.html')
 
+
+
+
 @login_required
 def logout_view(request):
     logout(request)
     messages.success(request, 'Logged out successfully!')
     return redirect('home')
+
+
+
+
 
 @login_required
 def dashboard(request):
@@ -66,6 +170,10 @@ def dashboard(request):
         'categories': Recipe.CATEGORY_CHOICES,
         'selected_category': category_filter
     })
+
+
+
+
 
 def recipes_list(request):
     search_query = request.GET.get('search', '')
@@ -148,6 +256,11 @@ def edit_recipe(request, recipe_id):
         'recipe': recipe,
         'categories': Recipe.CATEGORY_CHOICES
     })
+
+
+
+
+
 @login_required
 def delete_recipe(request, recipe_id):
     recipe = get_object_or_404(Recipe, id=recipe_id, user=request.user)
@@ -166,72 +279,8 @@ def about(request):
 
 
 
-# # views.py
-# import requests
-# from django.shortcuts import render
-# from django.http import JsonResponse
 
-# def search_flask_api(request):
-#     query = request.GET.get('q', '')
-#     if query:
-#         # Call Flask API with search query
-#         response = requests.get(f'http://127.0.0.1:5000/search?q={query}')
-#         data = response.json()
-#         return JsonResponse(data, safe=False)  # Or render a template
-#     return JsonResponse({'error': 'No query parameter provided'}, status=400)
-
-
-
-
-
-
-# views.py
-# import requests
-# from django.shortcuts import render
-
-# def search_flask_api(request):
-#     query = request.GET.get('q', '')
-#     data = []
-#     if query:
-#         try:
-#             response = requests.get(f'http://127.0.0.1:5000/search?q={query}')
-#             if response.status_code == 200:
-#                 data = response.json()
-#         except requests.exceptions.ConnectionError:
-#             data = [{"name": "Error", "description": "Could not connect to Flask API"}]
-#     return render(request, 'search.html', {'data': data, 'query': query})
-
-
-
-# views.py
-import requests
-from django.shortcuts import render
-
-def search_flask_api(request):
-    query = request.GET.get('q', '')
-    data = []
-    if query:
-        try:
-            response = requests.get(f'http://127.0.0.1:5000/search?q={query}')
-            if response.status_code == 200:
-                data = response.json()
-        except Exception as e:
-            print("Error:", e)
-            data = [{"name": "Error", "description": "Flask API not reachable"}]
-    return render(request, 'search.html', {'data': data, 'query': query})
-
-
-
-
-
-# home/views.py
-# home/views.py
-from rest_framework import viewsets
-from .models import MyModel  # or whatever your actual model is
-from .serializers import MyModelSerializer  # match your serializer name
 
 class MyModelViewSet(viewsets.ModelViewSet):
     queryset = MyModel.objects.all()
     serializer_class = MyModelSerializer  
-
-
